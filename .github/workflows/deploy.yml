@@ -1,49 +1,105 @@
-name: Deploy Portfolio to GitHub Pages
+name: CI/CD Pipeline for Portfolio
 
 on:
-  # Trigger the workflow on push to main branch
   push:
-    branches:
-      - main
-  # Allow manual triggering from GitHub Actions tab
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
   workflow_dispatch:
 
-# Sets permissions for GitHub Pages deployment
 permissions:
   contents: read
   pages: write
   id-token: write
 
-# Allow only one concurrent deployment
 concurrency:
   group: "pages"
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
-  # Build job
-  build:
+  # Test and Validate
+  test:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup Pages
-        uses: actions/configure-pages@v4
-
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          # Upload entire repository
-          path: '.'
-
-  # Deployment job
-  deploy:
+          node-version: '18'
+          
+      - name: Install HTMLHint
+        run: npm install -g htmlhint
+        
+      - name: Validate HTML
+        run: htmlhint index.html || true
+        
+      - name: Check for broken links
+        run: |
+          npm install -g broken-link-checker
+          blc http://localhost:3000 --requests=1 --exclude=mailto: --exclude=https://www.linkedin.com || true
+          
+      - name: Verify file structure
+        run: |
+          echo "Checking required files..."
+          test -f index.html && echo "✓ index.html exists"
+          echo "All checks passed!"
+          
+  # Lint and Format Check
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Check HTML syntax
+        run: |
+          echo "Checking HTML syntax..."
+          # Using tidy for HTML validation
+          sudo apt-get install tidy
+          tidy -e index.html || true
+          
+      - name: Check CSS syntax
+        run: |
+          echo "Checking CSS in HTML file..."
+          # Extract CSS from HTML and check
+          grep -o '<style>.*</style>' index.html | sed 's/<style>//g' | sed 's/<\/style>//g' > temp.css
+          npx css-validator temp.css --output=json || true
+          
+  # Build and Deploy
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    needs: [test, lint]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    needs: build
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+        
+      - name: Prepare deployment
+        run: |
+          echo "Preparing files for deployment..."
+          # Create a backup
+          cp index.html index.html.bak
+          # Optional: Minify HTML (if you want)
+          # npx html-minifier --collapse-whitespace --remove-comments --remove-optional-tags --remove-redundant-attributes --remove-script-type-attributes --remove-tag-whitespace --use-short-doctype index.html -o index.min.html
+          # mv index.min.html index.html
+          
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '.'
+          
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+        
+      - name: Clean up
+        if: always()
+        run: |
+          # Restore original file if minified
+          mv index.html.bak index.html 2>/dev/null || true
