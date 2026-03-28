@@ -65,7 +65,7 @@ jobs:
             echo "Consider using environment variables"
           fi
           
-          if grep -q "your-anon-key" index.html; then
+          if grep -q "sb_publishable_85UDpgCUl3-fiZc96Mf0ag_81EZKWYA" index.html; then
             echo "❌ Error: Placeholder Supabase key found!"
             exit 1
           fi
@@ -93,9 +93,9 @@ jobs:
       - name: Replace Supabase credentials
         run: |
           # Replace placeholder with actual credentials from secrets
-          sed -i "s|https://your-project.supabase.co|${{ secrets.SUPABASE_URL }}|g" index.html
-          sed -i "s|your-anon-key|${{ secrets.SUPABASE_ANON_KEY }}|g" index.html
-          sed -i "s|your-secure-password|${{ secrets.ADMIN_PASSWORD }}|g" admin.html 2>/dev/null || true
+          sed -i "s|https://rvmyhkrqghcuimktiazn.supabase.co|${{ secrets.SUPABASE_URL }}|g" index.html
+          sed -i "s|sb_publishable_85UDpgCUl3-fiZc96Mf0ag_81EZKWYA|${{ secrets.SUPABASE_ANON_KEY }}|g" index.html
+          sed -i "s|admin123|${{ secrets.ADMIN_PASSWORD }}|g" admin.html 2>/dev/null || true
       
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
