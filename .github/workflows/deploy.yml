@@ -1,0 +1,113 @@
+name: CI/CD Pipeline for Portfolio
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+# Add environment variables for Supabase
+env:
+  SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+  SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+  SUPABASE_SERVICE_ROLE: ${{ secrets.SUPABASE_SERVICE_ROLE }}
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  # Test Supabase Connection
+  test-supabase:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      
+      - name: Test Supabase Connection
+        run: |
+          npm install @supabase/supabase-js
+          node -e "
+          const { createClient } = require('@supabase/supabase-js');
+          const supabase = createClient('${{ secrets.SUPABASE_URL }}', '${{ secrets.SUPABASE_ANON_KEY }}');
+          supabase.from('messages').select('count', { count: 'exact', head: true })
+            .then(({ count, error }) => {
+              if (error) throw error;
+              console.log('✅ Supabase connected successfully! Total messages:', count);
+            })
+            .catch(error => {
+              console.error('❌ Supabase connection failed:', error);
+              process.exit(1);
+            });
+          "
+  
+  # Validate HTML with Supabase integration
+  validate:
+    runs-on: ubuntu-latest
+    needs: test-supabase
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Check for Supabase API keys
+        run: |
+          if grep -q "SUPABASE_URL" index.html; then
+            echo "⚠️  Warning: Hardcoded Supabase URL detected in HTML"
+            echo "Consider using environment variables"
+          fi
+          
+          if grep -q "your-anon-key" index.html; then
+            echo "❌ Error: Placeholder Supabase key found!"
+            exit 1
+          fi
+      
+      - name: Validate HTML structure
+        run: |
+          npm install -g htmlhint
+          htmlhint index.html || true
+  
+  # Build and Deploy
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [test-supabase, validate]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+      
+      - name: Replace Supabase credentials
+        run: |
+          # Replace placeholder with actual credentials from secrets
+          sed -i "s|https://your-project.supabase.co|${{ secrets.SUPABASE_URL }}|g" index.html
+          sed -i "s|your-anon-key|${{ secrets.SUPABASE_ANON_KEY }}|g" index.html
+          sed -i "s|your-secure-password|${{ secrets.ADMIN_PASSWORD }}|g" admin.html 2>/dev/null || true
+      
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '.'
+      
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+      
+      - name: Send deployment notification
+        if: success()
+        run: |
+          echo "✅ Portfolio with Supabase backend deployed!"
+          echo "🌐 Live at: ${{ steps.deployment.outputs.page_url }}"
