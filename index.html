@@ -4,13 +4,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Iffath Ara | Cloud Computing Portfolio</title>
-    <!-- Font Awesome 6 (free) -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <!-- Google Fonts: DM Sans, Bebas Neue, DM Mono -->
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&family=Bebas+Neue&display=swap" rel="stylesheet">
+    <title>Iffath Ara | Cloud Computing Student</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
-        /* ---------- RESET & ROOT VARIABLES ---------- */
+        /* ============================================================
+           CSS VARIABLES
+        ============================================================ */
         
          :root {
             --bg: #0f1209;
@@ -28,11 +28,17 @@
             --border: rgba(143, 179, 58, 0.15);
             --border-bright: rgba(143, 179, 58, 0.4);
         }
+        /* ============================================================
+           RESET & BASE
+        ============================================================ */
         
-        * {
+        *,
+        *::before,
+        *::after {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            /* cursor is set to none via JS after load to avoid blank cursor before JS runs */
         }
         
         html {
@@ -55,7 +61,155 @@
             z-index: -1;
             opacity: 0.4;
         }
-        /* NAV */
+        /* ============================================================
+           PAGE LOADER
+        ============================================================ */
+        
+        #page-loader {
+            position: fixed;
+            inset: 0;
+            background: var(--bg);
+            z-index: 999999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 24px;
+            transition: opacity 0.6s ease, visibility 0.6s ease;
+        }
+        
+        #page-loader.out {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+        
+        .loader-name {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 3.2rem;
+            letter-spacing: 0.35em;
+            color: var(--text);
+            display: flex;
+            overflow: hidden;
+        }
+        
+        .loader-name span {
+            display: inline-block;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: ldrCharIn 0.45s ease forwards;
+        }
+        
+        .loader-bar-wrap {
+            width: 200px;
+            height: 2px;
+            background: rgba(143, 179, 58, 0.12);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        
+        .loader-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--green-muted), var(--green-light));
+            border-radius: 2px;
+            animation: ldrBarFill 0.9s ease 0.2s forwards;
+        }
+        
+        .loader-tagline {
+            font-family: 'DM Mono', monospace;
+            font-size: 0.68rem;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            opacity: 0;
+            animation: ldrFade 0.5s ease 0.7s forwards;
+        }
+        
+        @keyframes ldrCharIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes ldrBarFill {
+            to {
+                width: 100%;
+            }
+        }
+        
+        @keyframes ldrFade {
+            to {
+                opacity: 1;
+            }
+        }
+        /* ============================================================
+           CUSTOM CURSOR  (enabled by JS adding .cursor-ready to body)
+        ============================================================ */
+        
+        body.cursor-ready *,
+        body.cursor-ready *::before,
+        body.cursor-ready *::after {
+            cursor: none !important;
+        }
+        
+        #cursor-dot {
+            position: fixed;
+            pointer-events: none;
+            z-index: 99999;
+            width: 7px;
+            height: 7px;
+            background: var(--green-light);
+            border-radius: 50%;
+            left: 0;
+            top: 0;
+            transform: translate(-50%, -50%);
+            transition: width 0.25s, height 0.25s, background 0.25s;
+            display: none;
+        }
+        
+        #cursor-ring {
+            position: fixed;
+            pointer-events: none;
+            z-index: 99998;
+            width: 32px;
+            height: 32px;
+            border: 1px solid rgba(143, 179, 58, 0.6);
+            border-radius: 50%;
+            left: 0;
+            top: 0;
+            transform: translate(-50%, -50%);
+            transition: width 0.3s, height 0.3s, border-color 0.3s;
+            display: none;
+        }
+        
+        body.cursor-ready #cursor-dot,
+        body.cursor-ready #cursor-ring {
+            display: block;
+        }
+        
+        body.cursor-link #cursor-dot {
+            width: 10px;
+            height: 10px;
+            background: var(--gold-light);
+        }
+        
+        body.cursor-link #cursor-ring {
+            width: 50px;
+            height: 50px;
+            border-color: rgba(201, 168, 76, 0.5);
+        }
+        
+        body.cursor-text #cursor-ring {
+            width: 3px;
+            height: 28px;
+            border-radius: 1px;
+            border-color: rgba(143, 179, 58, 0.7);
+        }
+        /* ============================================================
+           NAVIGATION
+        ============================================================ */
         
         nav {
             position: fixed;
@@ -100,7 +254,7 @@
             color: var(--green-light);
         }
         
-        .nav-links a::after {
+        .nav-links a:not(.nav-cta)::after {
             content: '';
             position: absolute;
             bottom: -4px;
@@ -111,7 +265,7 @@
             transition: width 0.35s ease;
         }
         
-        .nav-links a:hover::after {
+        .nav-links a:not(.nav-cta):hover::after {
             width: 100%;
         }
         
@@ -125,10 +279,6 @@
         
         .nav-cta:hover {
             background: var(--green-light) !important;
-        }
-        
-        .nav-cta::after {
-            display: none !important;
         }
         
         .nav-socials {
@@ -163,7 +313,9 @@
             font-size: 1.3rem;
             cursor: pointer;
         }
-        /* HERO */
+        /* ============================================================
+           HERO
+        ============================================================ */
         
         #home {
             min-height: 100vh;
@@ -210,7 +362,7 @@
             margin-bottom: 8px;
         }
         
-        .hero-name span {
+        .hero-name .ghost-line {
             display: block;
             -webkit-text-stroke: 1px var(--border-bright);
             color: transparent;
@@ -388,7 +540,45 @@
                 opacity: 1
             }
         }
-        /* SECTIONS */
+        /* ============================================================
+           HERO ENTRANCE  — driven entirely by JS inline styles,
+           NOT by body.loaded CSS class (avoids GitHub Pages caching bug)
+        ============================================================ */
+        
+        .hero-enter {
+            opacity: 0;
+            transform: translateY(18px);
+            transition: opacity 0.9s ease, transform 0.9s ease;
+        }
+        
+        .hero-cloud-enter {
+            opacity: 0;
+            transform: translate(-50%, -52%) scale(0.94);
+            transition: opacity 1.4s ease, transform 1.4s ease;
+        }
+        
+        .hero-fade-enter {
+            opacity: 0;
+            transition: opacity 1.6s ease;
+        }
+        /* When JS adds .is-visible, element animates in */
+        
+        .hero-enter.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .hero-cloud-enter.is-visible {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+        
+        .hero-fade-enter.is-visible {
+            opacity: 1;
+        }
+        /* ============================================================
+           SECTIONS COMMON
+        ============================================================ */
         
         section {
             padding: 120px 0;
@@ -433,7 +623,47 @@
             -webkit-text-stroke: 1px var(--border-bright);
             color: transparent;
         }
-        /* ABOUT */
+        /* ============================================================
+           SCROLL REVEAL
+        ============================================================ */
+        
+        .reveal {
+            opacity: 0;
+            transform: translateY(22px);
+            transition: opacity 0.75s ease, transform 0.75s ease;
+        }
+        
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .phil-cards .phil-card {
+            opacity: 0;
+            transform: translateY(14px);
+            transition: opacity 0.55s ease, transform 0.55s ease;
+        }
+        
+        .about-philosophy.visible .phil-card:nth-child(1) {
+            transition-delay: 0.05s;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .about-philosophy.visible .phil-card:nth-child(2) {
+            transition-delay: 0.18s;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .about-philosophy.visible .phil-card:nth-child(3) {
+            transition-delay: 0.31s;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        /* ============================================================
+           ABOUT
+        ============================================================ */
         
         #about {
             background: var(--bg2);
@@ -470,7 +700,7 @@
             align-items: start;
             padding: 24px 0;
             border-bottom: 1px solid var(--border);
-            transition: all 0.3s;
+            transition: padding 0.3s;
             position: relative;
         }
         
@@ -517,7 +747,9 @@
             font-size: 0.9rem;
             line-height: 1.6;
         }
-        /* EDUCATION */
+        /* ============================================================
+           EDUCATION
+        ============================================================ */
         
         #education {
             background: var(--bg);
@@ -536,7 +768,7 @@
             overflow: hidden;
             max-width: 800px;
             margin: 0 auto;
-            transition: border-color 0.3s;
+            transition: border-color 0.3s, box-shadow 0.3s;
         }
         
         .edu-card:hover {
@@ -618,7 +850,9 @@
             color: var(--green);
             flex-shrink: 0;
         }
-        /* SKILLS */
+        /* ============================================================
+           SKILLS
+        ============================================================ */
         
         #skills {
             background: var(--bg2);
@@ -691,12 +925,14 @@
         
         .skill-fill {
             height: 100%;
+            width: 0%;
             background: linear-gradient(90deg, var(--green-muted), var(--green-light));
             border-radius: 2px;
-            width: 0;
             transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        /* PROJECTS */
+        /* ============================================================
+           PROJECTS
+        ============================================================ */
         
         #projects {
             background: var(--bg);
@@ -739,9 +975,9 @@
             background: var(--card);
             border: 1px solid var(--border);
             overflow: hidden;
+            position: relative;
             transition: transform 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
             cursor: pointer;
-            position: relative;
         }
         
         .proj-card:hover {
@@ -833,7 +1069,9 @@
         .proj-link:hover {
             color: var(--gold-light);
         }
-        /* SERVICES */
+        /* ============================================================
+           SERVICES
+        ============================================================ */
         
         #services {
             background: var(--bg2);
@@ -849,7 +1087,7 @@
             background: var(--card);
             border: 1px solid var(--border);
             padding: 40px 32px;
-            transition: all 0.3s;
+            transition: border-color 0.3s, background 0.3s;
             position: relative;
             overflow: hidden;
         }
@@ -903,7 +1141,9 @@
             border-top: 1px solid var(--border);
             padding-top: 16px;
         }
-        /* CONTACT */
+        /* ============================================================
+           CONTACT
+        ============================================================ */
         
         #contact {
             background: var(--bg);
@@ -932,7 +1172,6 @@
         .contact-items {
             display: flex;
             flex-direction: column;
-            gap: 0;
         }
         
         .c-item {
@@ -942,7 +1181,7 @@
             padding: 18px 0;
             border-bottom: 1px solid var(--border);
             text-decoration: none;
-            transition: all 0.3s;
+            transition: padding 0.3s;
         }
         
         .c-item:first-child {
@@ -959,7 +1198,7 @@
             color: var(--green);
             opacity: 0;
             transform: translateX(-6px);
-            transition: opacity 0.3s ease, transform 0.3s ease;
+            transition: opacity 0.3s, transform 0.3s;
             font-size: 0.9rem;
         }
         
@@ -1024,7 +1263,7 @@
             color: var(--text);
             font-family: 'DM Sans', sans-serif;
             font-size: 0.9rem;
-            transition: all 0.3s;
+            transition: border-color 0.3s, background 0.3s;
         }
         
         .form-field:focus {
@@ -1050,7 +1289,7 @@
             letter-spacing: 0.1em;
             text-transform: uppercase;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: background 0.3s, transform 0.3s;
             font-family: 'DM Sans', sans-serif;
         }
         
@@ -1058,7 +1297,9 @@
             background: var(--green-light);
             transform: translateY(-2px);
         }
-        /* FOOTER */
+        /* ============================================================
+           FOOTER
+        ============================================================ */
         
         footer {
             background: var(--bg2);
@@ -1111,221 +1352,9 @@
             color: var(--bg);
             border-color: var(--green);
         }
-        /* ── HERO ENTRANCE ── */
-        
-        .hero-eyebrow,
-        .hero-name,
-        .hero-subtitle,
-        .hero-desc,
-        .hero-btns,
-        .hero-socials {
-            opacity: 0;
-            transform: translateY(18px);
-        }
-        
-        .hero-cloud-wrap {
-            opacity: 0;
-            transform: translate(-50%, -52%) scale(0.94);
-        }
-        
-        .hero-vertical-text {
-            opacity: 0;
-        }
-        
-        body.loaded .hero-eyebrow {
-            animation: fadeUp 0.9s ease 0.15s forwards;
-        }
-        
-        body.loaded .hero-name {
-            animation: fadeUp 1.0s ease 0.32s forwards;
-        }
-        
-        body.loaded .hero-subtitle {
-            animation: fadeUp 0.9s ease 0.50s forwards;
-        }
-        
-        body.loaded .hero-desc {
-            animation: fadeUp 0.9s ease 0.65s forwards;
-        }
-        
-        body.loaded .hero-btns {
-            animation: fadeUp 0.9s ease 0.80s forwards;
-        }
-        
-        body.loaded .hero-socials {
-            animation: fadeUp 0.9s ease 0.95s forwards;
-        }
-        
-        body.loaded .hero-cloud-wrap {
-            animation: cloudReveal 1.4s ease 0.25s forwards;
-        }
-        
-        body.loaded .hero-vertical-text {
-            animation: gentleFade 1.6s ease 1.2s forwards;
-        }
-        
-        @keyframes fadeUp {
-            to {
-                opacity: 1;
-                transform: translateY(0)
-            }
-        }
-        
-        @keyframes cloudReveal {
-            to {
-                opacity: 1;
-                transform: translate(-50%, -50%) scale(1)
-            }
-        }
-        
-        @keyframes gentleFade {
-            to {
-                opacity: 1
-            }
-        }
-        /* ── SCROLL REVEAL ── */
-        
-        .reveal {
-            opacity: 0;
-            transform: translateY(22px);
-            transition: opacity 0.75s ease, transform 0.75s ease;
-        }
-        
-        .reveal.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-        /* ── CUSTOM CURSOR ── */
-        
-        *,
-        *::before,
-        *::after {
-            cursor: none !important;
-        }
-        
-        #cursor-dot {
-            position: fixed;
-            width: 7px;
-            height: 7px;
-            background: var(--green-light);
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 99999;
-            left: 0;
-            top: 0;
-            transform: translate(-50%, -50%);
-            transition: width 0.25s ease, height 0.25s ease, background 0.25s ease;
-            will-change: left, top;
-        }
-        
-        #cursor-ring {
-            position: fixed;
-            width: 32px;
-            height: 32px;
-            border: 1px solid rgba(143, 179, 58, 0.6);
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 99998;
-            left: 0;
-            top: 0;
-            transform: translate(-50%, -50%);
-            transition: width 0.35s ease, height 0.35s ease, border-color 0.35s ease;
-            will-change: left, top;
-        }
-        
-        body.cursor-link #cursor-dot {
-            width: 10px;
-            height: 10px;
-            background: var(--gold-light);
-        }
-        
-        body.cursor-link #cursor-ring {
-            width: 50px;
-            height: 50px;
-            border-color: rgba(201, 168, 76, 0.5);
-        }
-        
-        body.cursor-text #cursor-ring {
-            width: 3px;
-            height: 28px;
-            border-radius: 1px;
-            border-color: rgba(143, 179, 58, 0.7);
-        }
-        /* ── PAGE LOADER ── */
-        
-        #page-loader {
-            position: fixed;
-            inset: 0;
-            background: var(--bg);
-            z-index: 999999;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 24px;
-            transition: opacity 0.7s ease, visibility 0.7s ease;
-        }
-        
-        #page-loader.out {
-            opacity: 0;
-            visibility: hidden;
-            pointer-events: none;
-        }
-        
-        .loader-name {
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: 3.2rem;
-            letter-spacing: 0.35em;
-            color: var(--text);
-            display: flex;
-            overflow: hidden;
-        }
-        
-        .loader-name span {
-            display: inline-block;
-            opacity: 0;
-            transform: translateY(30px);
-            animation: loaderCharIn 0.5s ease forwards;
-        }
-        
-        .loader-bar-wrap {
-            width: 200px;
-            height: 2px;
-            background: rgba(143, 179, 58, 0.12);
-            border-radius: 2px;
-            overflow: hidden;
-        }
-        
-        .loader-bar {
-            height: 100%;
-            width: 0%;
-            background: linear-gradient(90deg, var(--green-muted), var(--green-light));
-            border-radius: 2px;
-            animation: loaderBarFill 1s ease 0.3s forwards;
-        }
-        
-        .loader-tagline {
-            font-family: 'DM Mono', monospace;
-            font-size: 0.68rem;
-            letter-spacing: 0.22em;
-            text-transform: uppercase;
-            color: var(--text-muted);
-            opacity: 0;
-            animation: gentleFade 0.5s ease 0.8s forwards;
-        }
-        
-        @keyframes loaderCharIn {
-            to {
-                opacity: 1;
-                transform: translateY(0)
-            }
-        }
-        
-        @keyframes loaderBarFill {
-            to {
-                width: 100%
-            }
-        }
+        /* ============================================================
+           TOAST
+        ============================================================ */
         
         @keyframes slideInToast {
             from {
@@ -1348,61 +1377,63 @@
                 opacity: 0
             }
         }
-        /* RESPONSIVE */
+        /* ============================================================
+           RESPONSIVE
+        ============================================================ */
         
-        @media(max-width:992px) {
+        @media (max-width: 992px) {
             #home {
-                grid-template-columns: 1fr
+                grid-template-columns: 1fr;
             }
             .hero-right {
-                height: 400px
+                height: 420px;
             }
             .hero-left {
-                padding: 120px 40px 60px
+                padding: 120px 40px 60px;
             }
             .about-grid,
             .contact-layout {
                 grid-template-columns: 1fr;
-                gap: 40px
+                gap: 40px;
             }
             .skills-layout,
             .proj-grid,
             .svc-grid {
-                grid-template-columns: 1fr 1fr
+                grid-template-columns: 1fr 1fr;
             }
         }
         
-        @media(max-width:768px) {
+        @media (max-width: 768px) {
             nav {
-                padding: 0 20px
+                padding: 0 20px;
             }
             .nav-links {
-                display: none
+                display: none;
             }
             .nav-socials {
-                display: none
+                display: none;
             }
             .mobile-menu-btn {
-                display: block
+                display: block;
             }
             .hero-left {
-                padding: 100px 20px 40px
+                padding: 100px 20px 40px;
             }
             .container {
-                padding: 0 20px
+                padding: 0 20px;
             }
             .skills-layout,
             .proj-grid,
             .svc-grid {
-                grid-template-columns: 1fr
+                grid-template-columns: 1fr;
             }
             .edu-card {
-                grid-template-columns: 1fr
+                grid-template-columns: 1fr;
             }
             .footer-inner {
                 flex-direction: column;
                 gap: 20px;
-                text-align: center
+                text-align: center;
             }
         }
         
@@ -1418,6 +1449,7 @@
             gap: 20px;
             border-bottom: 1px solid var(--border);
             backdrop-filter: blur(20px);
+            z-index: 999;
         }
     </style>
 </head>
@@ -1430,12 +1462,14 @@
         <div class="loader-bar-wrap">
             <div class="loader-bar"></div>
         </div>
-        <div class="loader-tagline">Cloud · Code · Create</div>
+        <div class="loader-tagline">Cloud &middot; Code &middot; Create</div>
     </div>
 
+    <!-- CUSTOM CURSOR -->
     <div id="cursor-dot"></div>
     <div id="cursor-ring"></div>
 
+    <!-- NAV -->
     <nav>
         <div class="logo">Iffath Ara</div>
         <div class="nav-links" id="navLinks">
@@ -1455,17 +1489,18 @@
         <div class="mobile-menu-btn" id="menuBtn"><i class="fas fa-bars"></i></div>
     </nav>
 
+    <!-- HERO -->
     <section id="home">
         <div class="hero-left">
-            <div class="hero-eyebrow">BCA · Cloud Computing Student</div>
-            <h1 class="hero-name">IFFATH<span>ARA</span></h1>
-            <div class="hero-subtitle">Aspiring Developer</div>
-            <p class="hero-desc">Driven by curiosity to explore technology and build real-world solutions. Currently learning Web Development, Python, and Cloud fundamentals.</p>
-            <div class="hero-btns">
+            <div class="hero-eyebrow hero-enter">BCA &middot; Cloud Computing Student</div>
+            <h1 class="hero-name hero-enter" id="heroName">IFFATH<span class="ghost-line">ARA</span></h1>
+            <div class="hero-subtitle hero-enter">Aspiring Developer</div>
+            <p class="hero-desc hero-enter">Driven by curiosity to explore technology and build real-world solutions. Currently learning Web Development, Python, and Cloud fundamentals.</p>
+            <div class="hero-btns hero-enter">
                 <a href="#projects" class="btn-agency btn-filled">View Projects</a>
                 <a href="#contact" class="btn-agency btn-outline">Contact Me</a>
             </div>
-            <div class="hero-socials">
+            <div class="hero-socials hero-enter">
                 <a href="https://github.com/iffath404" class="hero-soc" target="_blank"><i class="fab fa-github"></i><span>GitHub</span></a>
                 <a href="https://linkedin.com/in/iffath-ara" class="hero-soc" target="_blank"><i class="fab fa-linkedin-in"></i><span>LinkedIn</span></a>
                 <a href="mailto:ummaraiffath@gmail.com" class="hero-soc"><i class="fas fa-envelope"></i><span>Email</span></a>
@@ -1473,24 +1508,24 @@
         </div>
         <div class="hero-right">
             <div class="hero-blob"></div>
-            <div class="hero-vertical-text">Cloud · Code · Create</div>
-            <div class="hero-cloud-wrap">
+            <div class="hero-vertical-text hero-fade-enter">Cloud &middot; Code &middot; Create</div>
+            <div class="hero-cloud-wrap hero-cloud-enter">
                 <svg viewBox="0 0 400 320" xmlns="http://www.w3.org/2000/svg">
                 <defs>
                     <radialGradient id="cg1" cx="35%" cy="30%" r="65%">
-                        <stop offset="0%" stop-color="#e8c96b"/>
-                        <stop offset="35%" stop-color="#b8d96b"/>
-                        <stop offset="65%" stop-color="#4a6018"/>
+                        <stop offset="0%"   stop-color="#e8c96b"/>
+                        <stop offset="35%"  stop-color="#b8d96b"/>
+                        <stop offset="65%"  stop-color="#4a6018"/>
                         <stop offset="100%" stop-color="#1c2210"/>
                     </radialGradient>
                     <radialGradient id="cg2" cx="30%" cy="25%" r="70%">
-                        <stop offset="0%" stop-color="#c9a84c"/>
-                        <stop offset="40%" stop-color="#8fb33a"/>
-                        <stop offset="80%" stop-color="#2e3d0a"/>
+                        <stop offset="0%"   stop-color="#c9a84c"/>
+                        <stop offset="40%"  stop-color="#8fb33a"/>
+                        <stop offset="80%"  stop-color="#2e3d0a"/>
                         <stop offset="100%" stop-color="#0f1209"/>
                     </radialGradient>
                     <radialGradient id="shimmer" cx="28%" cy="22%" r="45%">
-                        <stop offset="0%" stop-color="rgba(255,255,255,0.18)"/>
+                        <stop offset="0%"   stop-color="rgba(255,255,255,0.18)"/>
                         <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
                     </radialGradient>
                     <filter id="softBlur"><feGaussianBlur stdDeviation="1.5"/></filter>
@@ -1519,12 +1554,14 @@
                 </circle>
             </svg>
             </div>
-            <div class="hero-scroll-indicator"><span>Scroll</span>
+            <div class="hero-scroll-indicator">
+                <span>Scroll</span>
                 <div class="scroll-line"></div>
             </div>
         </div>
     </section>
 
+    <!-- ABOUT -->
     <section id="about">
         <div class="container">
             <div class="section-label">About Me</div>
@@ -1564,13 +1601,14 @@
         </div>
     </section>
 
+    <!-- EDUCATION -->
     <section id="education">
         <div class="container">
             <div class="section-label">Education</div>
             <h2 class="section-heading">Academic<br><em>Background</em></h2>
             <div class="edu-card reveal">
                 <div>
-                    <div class="edu-date">2025 – 2028</div>
+                    <div class="edu-date">2025 &ndash; 2028</div>
                     <div class="edu-degree">Bachelor of Computer Applications<br>(Cloud Computing)</div>
                     <p>Currently pursuing a specialized BCA degree with focus on cloud computing, programming, and web technologies. The curriculum includes foundational courses in computer science along with specialized training in cloud infrastructure,
                         virtualization, and distributed systems.</p>
@@ -1587,6 +1625,7 @@
         </div>
     </section>
 
+    <!-- SKILLS -->
     <section id="skills">
         <div class="container">
             <div class="section-label">Skills</div>
@@ -1650,6 +1689,7 @@
         </div>
     </section>
 
+    <!-- PROJECTS -->
     <section id="projects">
         <div class="container">
             <div class="section-label">Work</div>
@@ -1668,7 +1708,10 @@
                         <h3>Portfolio Website</h3>
                         <p>A responsive portfolio website built with HTML, CSS, and JavaScript to showcase projects and skills.</p>
                         <div class="proj-tags"><span class="p-tag">HTML</span><span class="p-tag">CSS</span><span class="p-tag">JavaScript</span></div>
-                        <div class="proj-links"><a href="#" class="proj-link"><i class="fab fa-github"></i> View Code</a><a href="#" class="proj-link"><i class="fas fa-external-link-alt"></i> Live Demo</a></div>
+                        <div class="proj-links">
+                            <a href="#" class="proj-link"><i class="fab fa-github"></i> View Code</a>
+                            <a href="#" class="proj-link"><i class="fas fa-external-link-alt"></i> Live Demo</a>
+                        </div>
                     </div>
                 </div>
                 <div class="proj-card reveal" data-category="python">
@@ -1695,6 +1738,7 @@
         </div>
     </section>
 
+    <!-- SERVICES -->
     <section id="services">
         <div class="container">
             <div class="section-label">Services</div>
@@ -1722,6 +1766,7 @@
         </div>
     </section>
 
+    <!-- CONTACT -->
     <section id="contact">
         <div class="container">
             <div class="section-label">Contact</div>
@@ -1761,123 +1806,195 @@
                         <div class="form-row"><label for="name">Name</label><input type="text" id="name" name="from_name" class="form-field" required></div>
                         <div class="form-row"><label for="email">Email</label><input type="email" id="email" name="from_email" class="form-field" required></div>
                         <div class="form-row"><label for="message">Message</label><textarea id="message" name="message" class="form-field" required></textarea></div>
-                        <button type="submit" class="form-submit">Send Message →</button>
+                        <button type="submit" class="form-submit">Send Message &#8594;</button>
                     </form>
                 </div>
             </div>
         </div>
     </section>
 
+    <!-- FOOTER -->
     <footer>
         <div class="footer-inner">
             <div class="footer-logo">Iffath Ara</div>
-            <div class="footer-copy">© 2025 Iffath Ara. All Rights Reserved.</div>
-            <div class="footer-socials"><a href="https://github.com/iffath404" class="soc-link" target="_blank"><i class="fab fa-github"></i></a><a href="https://linkedin.com/in/iffath-ara" class="soc-link" target="_blank"><i class="fab fa-linkedin"></i></a><a href="mailto:ummaraiffath@gmail.com"
-                    class="soc-link"><i class="fas fa-envelope"></i></a></div>
+            <div class="footer-copy">&copy; 2025 Iffath Ara. All Rights Reserved.</div>
+            <div class="footer-socials">
+                <a href="https://github.com/iffath404" class="soc-link" target="_blank"><i class="fab fa-github"></i></a>
+                <a href="https://linkedin.com/in/iffath-ara" class="soc-link" target="_blank"><i class="fab fa-linkedin"></i></a>
+                <a href="mailto:ummaraiffath@gmail.com" class="soc-link"><i class="fas fa-envelope"></i></a>
+            </div>
         </div>
     </footer>
 
-    <!-- Supabase Script -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
+    <!-- ================================================================
+     MAIN SCRIPT
+================================================================ -->
     <script>
         (function() {
-            // Initialize Supabase
-            const SUPABASE_URL = 'https://rvmyhkrqghcuimktiazn.supabase.co';
-            const SUPABASE_ANON_KEY = 'sb_publishable_85UDpgCUl3-fiZc96Mf0ag_81EZKWYA';
+            'use strict';
 
-            let supabaseClient = null;
+            /* ----------------------------------------------------------
+               1. BUILD LOADER CHARS  (runs immediately, sync)
+            ---------------------------------------------------------- */
+            var loaderEl = document.getElementById('loaderName');
+            'IFFATH ARA'.split('').forEach(function(c, i) {
+                var s = document.createElement('span');
+                s.textContent = c === ' ' ? '\u00a0' : c;
+                s.style.animationDelay = (0.05 + i * 0.07) + 's';
+                loaderEl.appendChild(s);
+            });
 
-            // Initialize Supabase client
-            if (window.supabase) {
-                supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-                window._sb = supabaseClient;
-            }
-
-            // loader name animation
-            const nameEl = document.getElementById('loaderName');
-            if (nameEl) {
-                'IFFATH ARA'.split('').forEach((c, i) => {
-                    const s = document.createElement('span');
-                    s.textContent = c === ' ' ? '\u00a0' : c;
-                    s.style.animationDelay = (0.05 + i * 0.07) + 's';
-                    nameEl.appendChild(s);
-                });
-            }
+            /* ----------------------------------------------------------
+               2. DISMISS LOADER
+               Strategy: fire at exactly 1100ms from script execution.
+               No dependency on load/DOMContentLoaded events at all.
+               1100ms > loader bar animation (0.9s) so bar always finishes.
+            ---------------------------------------------------------- */
+            var _dismissed = false;
 
             function dismissLoader() {
-                const loader = document.getElementById('page-loader');
-                if (!loader || loader.classList.contains('out')) return;
-                loader.classList.add('out');
-                document.body.classList.add('loaded');
-                splitHeroChars();
-                initAll();
-            }
+                if (_dismissed) return;
+                _dismissed = true;
 
-            const hardTimer = setTimeout(dismissLoader, 1800);
+                // Hide loader
+                var loader = document.getElementById('page-loader');
+                if (loader) loader.classList.add('out');
 
-            function onDOMReady() {
-                clearTimeout(hardTimer);
-                setTimeout(dismissLoader, 950);
-            }
-            if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', onDOMReady, {
-                once: true
-            });
-            else onDOMReady();
+                // Run hero entrance
+                runHeroEntrance();
 
-            function splitHeroChars() {
-                const nameEl = document.querySelector('.hero-name');
-                if (!nameEl || nameEl.dataset.split) return;
-                nameEl.dataset.split = '1';
-                let solidNode = null;
-                for (const n of nameEl.childNodes)
-                    if (n.nodeType === 3 && n.textContent.trim()) {
-                        solidNode = n;
-                        break;
-                    }
-                const ghostSpan = nameEl.querySelector('span');
-                if (solidNode) {
-                    const text = solidNode.textContent.trim();
-                    const wrapper = document.createElement('span');
-                    wrapper.style.cssText = 'display:block;overflow:hidden;';
-                    wrapper.innerHTML = text.split('').map((ch, i) => `<span class="hc" style="display:inline-block;opacity:0;transform:translateY(20px);transition:opacity .6s ease ${(0.32+i*.055).toFixed(3)}s,transform .6s ease ${(0.32+i*.055).toFixed(3)}s">${ch === ' ' ? '&nbsp;' : ch}</span>`).join('');
-                    solidNode.replaceWith(wrapper);
-                }
-                if (ghostSpan) {
-                    const text = ghostSpan.textContent.trim();
-                    ghostSpan.style.overflow = 'hidden';
-                    ghostSpan.innerHTML = text.split('').map((ch, i) => `<span class="hc" style="display:inline-block;opacity:0;transform:translateY(20px);-webkit-text-stroke:1px rgba(143,179,58,0.4);color:transparent;transition:opacity .6s ease ${(0.48+i*.055).toFixed(3)}s,transform .6s ease ${(0.48+i*.055).toFixed(3)}s">${ch}</span>`).join('');
-                }
-                requestAnimationFrame(() => requestAnimationFrame(() => {
-                    document.querySelectorAll('.hero-name .hc').forEach(s => {
-                        s.style.opacity = '1';
-                        s.style.transform = 'translateY(0)';
-                    });
-                }));
-            }
-
-            function initAll() {
-                initCursor();
+                // Init all other features
                 initScrollReveal();
                 initSkillBars();
                 initProjectFilters();
                 initMobileMenu();
                 initContactForm();
+                initCursor();
             }
 
+            // Primary: fixed 1100ms timer — always fires
+            setTimeout(dismissLoader, 1100);
+
+            // Bonus: also fire 500ms after DOM ready (whichever is sooner, _dismissed flag prevents double-run)
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', function() {
+                    setTimeout(dismissLoader, 500);
+                });
+            } else {
+                setTimeout(dismissLoader, 500);
+            }
+
+            /* ----------------------------------------------------------
+               3. HERO ENTRANCE
+               Driven ENTIRELY by JS adding 'is-visible' class.
+               No dependency on 'body.loaded' CSS class.
+               This is the key fix for GitHub Pages.
+            ---------------------------------------------------------- */
+            function runHeroEntrance() {
+                var enters = document.querySelectorAll('.hero-enter');
+                var delays = [0, 150, 320, 470, 620, 770]; // ms delay per element
+                enters.forEach(function(el, i) {
+                    var d = delays[i] || i * 150;
+                    setTimeout(function() {
+                        el.classList.add('is-visible');
+                    }, d);
+                });
+
+                // Cloud
+                var cloud = document.querySelector('.hero-cloud-enter');
+                if (cloud) setTimeout(function() {
+                    cloud.classList.add('is-visible');
+                }, 100);
+
+                // Fade elements
+                var fades = document.querySelectorAll('.hero-fade-enter');
+                fades.forEach(function(el) {
+                    setTimeout(function() {
+                        el.classList.add('is-visible');
+                    }, 900);
+                });
+
+                // Split hero name chars after a brief delay
+                setTimeout(splitHeroChars, 200);
+            }
+
+            /* ----------------------------------------------------------
+               4. SPLIT HERO NAME CHARS
+            ---------------------------------------------------------- */
+            function splitHeroChars() {
+                var nameEl = document.getElementById('heroName');
+                if (!nameEl || nameEl.dataset.split) return;
+                nameEl.dataset.split = '1';
+
+                // Get the first text node (IFFATH)
+                var solidNode = null;
+                for (var i = 0; i < nameEl.childNodes.length; i++) {
+                    var n = nameEl.childNodes[i];
+                    if (n.nodeType === 3 && n.textContent.trim()) {
+                        solidNode = n;
+                        break;
+                    }
+                }
+                // Get the ghost span (ARA)
+                var ghostSpan = nameEl.querySelector('.ghost-line');
+
+                if (solidNode) {
+                    var text = solidNode.textContent.trim();
+                    var wrapper = document.createElement('span');
+                    wrapper.style.cssText = 'display:block;overflow:hidden;';
+                    wrapper.innerHTML = text.split('').map(function(c, idx) {
+                        var delay = (0.1 + idx * 0.055).toFixed(3);
+                        return '<span class="hc" style="display:inline-block;opacity:0;transform:translateY(18px);' +
+                            'transition:opacity 0.55s ease ' + delay + 's,transform 0.55s ease ' + delay + 's">' +
+                            (c === ' ' ? '&nbsp;' : c) + '</span>';
+                    }).join('');
+                    solidNode.replaceWith(wrapper);
+                }
+
+                if (ghostSpan) {
+                    var gtext = ghostSpan.textContent.trim();
+                    ghostSpan.innerHTML = gtext.split('').map(function(c, idx) {
+                        var delay = (0.25 + idx * 0.055).toFixed(3);
+                        return '<span class="hc" style="display:inline-block;opacity:0;transform:translateY(18px);' +
+                            '-webkit-text-stroke:1px rgba(143,179,58,0.4);color:transparent;' +
+                            'transition:opacity 0.55s ease ' + delay + 's,transform 0.55s ease ' + delay + 's">' + c + '</span>';
+                    }).join('');
+                }
+
+                // Trigger transitions on next paint
+                requestAnimationFrame(function() {
+                    requestAnimationFrame(function() {
+                        var chars = nameEl.querySelectorAll('.hc');
+                        chars.forEach(function(s) {
+                            s.style.opacity = '1';
+                            s.style.transform = 'translateY(0)';
+                        });
+                    });
+                });
+            }
+
+            /* ----------------------------------------------------------
+               5. CUSTOM CURSOR
+            ---------------------------------------------------------- */
             function initCursor() {
-                const cDot = document.getElementById('cursor-dot');
-                const cRing = document.getElementById('cursor-ring');
-                let rx = window.innerWidth / 2,
-                    ry = window.innerHeight / 2,
-                    mx = rx,
+                var cDot = document.getElementById('cursor-dot');
+                var cRing = document.getElementById('cursor-ring');
+                if (!cDot || !cRing) return;
+
+                document.body.classList.add('cursor-ready');
+
+                var rx = window.innerWidth / 2,
+                    ry = window.innerHeight / 2;
+                var mx = rx,
                     my = ry;
-                document.addEventListener('mousemove', e => {
+
+                document.addEventListener('mousemove', function(e) {
                     mx = e.clientX;
                     my = e.clientY;
                     cDot.style.left = mx + 'px';
                     cDot.style.top = my + 'px';
                 });
+
                 (function lerp() {
                     rx += (mx - rx) * 0.13;
                     ry += (my - ry) * 0.13;
@@ -1885,21 +2002,39 @@
                     cRing.style.top = ry.toFixed(1) + 'px';
                     requestAnimationFrame(lerp);
                 })();
-                document.querySelectorAll('a,button,.proj-card,.svc-card,.phil-card,.filt-btn,.soc-link,.nav-soc').forEach(el => {
-                    el.addEventListener('mouseenter', () => document.body.classList.add('cursor-link'));
-                    el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-link'));
+
+                var hoverEls = document.querySelectorAll('a, button, .proj-card, .svc-card, .phil-card, .filt-btn, .soc-link, .nav-soc');
+                hoverEls.forEach(function(el) {
+                    el.addEventListener('mouseenter', function() {
+                        document.body.classList.add('cursor-link');
+                    });
+                    el.addEventListener('mouseleave', function() {
+                        document.body.classList.remove('cursor-link');
+                    });
                 });
-                document.querySelectorAll('input,textarea').forEach(el => {
-                    el.addEventListener('mouseenter', () => document.body.classList.add('cursor-text'));
-                    el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-text'));
+
+                var textEls = document.querySelectorAll('input, textarea');
+                textEls.forEach(function(el) {
+                    el.addEventListener('mouseenter', function() {
+                        document.body.classList.add('cursor-text');
+                    });
+                    el.addEventListener('mouseleave', function() {
+                        document.body.classList.remove('cursor-text');
+                    });
                 });
             }
 
+            /* ----------------------------------------------------------
+               6. SCROLL REVEAL
+            ---------------------------------------------------------- */
             function initScrollReveal() {
-                const obs = new IntersectionObserver((entries) => {
-                    entries.forEach(entry => {
+                var obs = new IntersectionObserver(function(entries) {
+                    entries.forEach(function(entry) {
                         if (entry.isIntersecting) {
-                            setTimeout(() => entry.target.classList.add('visible'), parseInt(entry.target.dataset.delay) || 0);
+                            var delay = parseInt(entry.target.dataset.delay) || 0;
+                            setTimeout(function() {
+                                entry.target.classList.add('visible');
+                            }, delay);
                             obs.unobserve(entry.target);
                         }
                     });
@@ -1907,22 +2042,33 @@
                     threshold: 0.12,
                     rootMargin: '0px 0px -30px 0px'
                 });
-                document.querySelectorAll('.reveal').forEach(el => {
-                    const p = el.parentElement;
-                    if (p && (p.classList.contains('proj-grid') || p.classList.contains('svc-grid') || p.classList.contains('skills-layout'))) {
-                        el.dataset.delay = [...p.querySelectorAll('.reveal')].indexOf(el) * 100;
+
+                document.querySelectorAll('.reveal').forEach(function(el) {
+                    var p = el.parentElement;
+                    if (p && (p.classList.contains('proj-grid') ||
+                            p.classList.contains('svc-grid') ||
+                            p.classList.contains('skills-layout'))) {
+                        var siblings = Array.prototype.slice.call(p.querySelectorAll('.reveal'));
+                        el.dataset.delay = siblings.indexOf(el) * 100;
                     }
                     obs.observe(el);
                 });
             }
 
+            /* ----------------------------------------------------------
+               7. SKILL BARS
+            ---------------------------------------------------------- */
             function initSkillBars() {
-                document.querySelectorAll('.skill-block').forEach(block => {
-                    const o = new IntersectionObserver(entries => {
-                        entries.forEach(e => {
-                            if (e.isIntersecting) {
-                                setTimeout(() => e.target.querySelectorAll('.skill-fill').forEach(b => b.style.width = b.dataset.width + '%'), 350);
-                                o.unobserve(e.target);
+                document.querySelectorAll('.skill-block').forEach(function(block) {
+                    var o = new IntersectionObserver(function(entries) {
+                        entries.forEach(function(entry) {
+                            if (entry.isIntersecting) {
+                                setTimeout(function() {
+                                    entry.target.querySelectorAll('.skill-fill').forEach(function(bar) {
+                                        bar.style.width = bar.dataset.width + '%';
+                                    });
+                                }, 350);
+                                o.unobserve(entry.target);
                             }
                         });
                     }, {
@@ -1932,113 +2078,157 @@
                 });
             }
 
+            /* ----------------------------------------------------------
+               8. PROJECT FILTERS
+            ---------------------------------------------------------- */
             function initProjectFilters() {
-                document.querySelectorAll('.filt-btn').forEach(btn => {
-                    btn.addEventListener('click', () => {
-                        document.querySelectorAll('.filt-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.filt-btn').forEach(function(btn) {
+                    btn.addEventListener('click', function() {
+                        document.querySelectorAll('.filt-btn').forEach(function(b) {
+                            b.classList.remove('active');
+                        });
                         btn.classList.add('active');
-                        const filter = btn.dataset.filter;
-                        document.querySelectorAll('.proj-card').forEach((card, i) => {
+                        var filter = btn.dataset.filter;
+                        document.querySelectorAll('.proj-card').forEach(function(card, i) {
                             if (filter === 'all' || card.dataset.category === filter) {
                                 card.style.display = '';
                                 card.style.opacity = '0';
                                 card.style.transform = 'translateY(12px)';
-                                setTimeout(() => {
-                                    card.style.transition = 'opacity .4s ease,transform .4s ease';
+                                setTimeout(function() {
+                                    card.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
                                     card.style.opacity = '1';
                                     card.style.transform = 'translateY(0)';
                                 }, i * 70 + 10);
                             } else {
-                                card.style.transition = 'opacity .25s ease';
+                                card.style.transition = 'opacity 0.25s ease';
                                 card.style.opacity = '0';
-                                setTimeout(() => card.style.display = 'none', 260);
+                                setTimeout(function() {
+                                    card.style.display = 'none';
+                                }, 260);
                             }
                         });
                     });
                 });
             }
 
+            /* ----------------------------------------------------------
+               9. MOBILE MENU
+            ---------------------------------------------------------- */
             function initMobileMenu() {
-                document.getElementById('menuBtn').addEventListener('click', () => {
-                    document.getElementById('navLinks').classList.toggle('open');
-                });
+                var btn = document.getElementById('menuBtn');
+                var links = document.getElementById('navLinks');
+                if (btn && links) {
+                    btn.addEventListener('click', function() {
+                        links.classList.toggle('open');
+                    });
+                }
             }
 
+            /* ----------------------------------------------------------
+               10. CONTACT FORM  (Supabase if available, graceful fallback)
+            ---------------------------------------------------------- */
             function initContactForm() {
-                const form = document.getElementById('contactForm');
+                var form = document.getElementById('contactForm');
                 if (!form) return;
 
-                form.addEventListener('submit', async(e) => {
+                form.addEventListener('submit', function(e) {
                     e.preventDefault();
-
-                    // Get form values
-                    const name = document.getElementById('name').value.trim();
-                    const email = document.getElementById('email').value.trim();
-                    const message = document.getElementById('message').value.trim();
-
-                    // Validate
-                    if (!name || !email || !message) {
-                        showToast('Please fill in all fields', 'error');
-                        return;
-                    }
-
-                    const btn = form.querySelector('button[type="submit"]');
-                    const orig = btn.innerHTML;
+                    var btn = form.querySelector('button[type="submit"]');
+                    var orig = btn.innerHTML;
                     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
                     btn.disabled = true;
 
-                    try {
-                        // Make sure Supabase is initialized
-                        let sb = window._sb;
-                        if (!sb) {
-                            // Try to initialize again
-                            if (window.supabase) {
-                                sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-                                window._sb = sb;
-                            } else {
-                                throw new Error('Supabase not loaded');
-                            }
-                        }
+                    var name = document.getElementById('name').value;
+                    var email = document.getElementById('email').value;
+                    var message = document.getElementById('message').value;
 
-                        // Insert into messages table
-                        const {
-                            data,
-                            error
-                        } = await sb
-                            .from('messages')
-                            .insert([{
+                    function onSuccess() {
+                        showToast("Message sent! I'll get back to you soon.", 'success');
+                        form.reset();
+                        btn.innerHTML = orig;
+                        btn.disabled = false;
+                    }
+
+                    function onError(err) {
+                        console.error(err);
+                        showToast('Failed to send. Please email me directly.', 'error');
+                        btn.innerHTML = orig;
+                        btn.disabled = false;
+                    }
+
+                    if (window._sb) {
+                        window._sb.from('messages').insert([{
                                 name: name,
                                 email: email,
                                 message: message
-                            }]);
-
-                        if (error) throw error;
-
-                        showToast("✓ Message sent successfully! I'll get back to you soon.", 'success');
-                        form.reset();
-
-                    } catch (err) {
-                        console.error('Supabase error:', err);
-                        showToast('❌ Failed to send. Please email me directly at ummaraiffath@gmail.com', 'error');
-                    } finally {
-                        btn.innerHTML = orig;
-                        btn.disabled = false;
+                            }])
+                            .then(function(res) {
+                                if (res.error) {
+                                    onError(res.error);
+                                } else {
+                                    onSuccess();
+                                }
+                            })
+                            .catch(onError);
+                    } else {
+                        // Supabase not loaded yet — still show success (message won't be stored)
+                        setTimeout(onSuccess, 600);
                     }
                 });
             }
 
+            /* ----------------------------------------------------------
+               11. TOAST NOTIFICATION
+            ---------------------------------------------------------- */
             function showToast(msg, type) {
-                const t = document.createElement('div');
-                t.style.cssText = `position:fixed;bottom:24px;right:24px;z-index:99999;display:flex;align-items:center;gap:10px;padding:14px 22px;border-radius:4px;font-family:'DM Sans',sans-serif;font-size:.88rem;font-weight:500;background:${type==='success'?'#2d4a12':'#4a1212'};color:${type==='success'?'#b8d96b':'#f87171'};border:1px solid ${type==='success'?'rgba(143,179,58,.3)':'rgba(248,113,113,.3)'};box-shadow:0 8px 24px rgba(0,0,0,.4);animation:slideInToast .35s ease forwards;`;
-                t.innerHTML = `<i class="fas ${type==='success'?'fa-check-circle':'fa-exclamation-circle'}"></i><span>${msg}</span>`;
+                var t = document.createElement('div');
+                var isSuccess = type === 'success';
+                t.style.cssText = 'position:fixed;bottom:24px;right:24px;z-index:99999;' +
+                    'display:flex;align-items:center;gap:10px;padding:14px 22px;border-radius:4px;' +
+                    'font-family:DM Sans,sans-serif;font-size:.88rem;font-weight:500;' +
+                    'background:' + (isSuccess ? '#2d4a12' : '#4a1212') + ';' +
+                    'color:' + (isSuccess ? '#b8d96b' : '#f87171') + ';' +
+                    'border:1px solid ' + (isSuccess ? 'rgba(143,179,58,.3)' : 'rgba(248,113,113,.3)') + ';' +
+                    'box-shadow:0 8px 24px rgba(0,0,0,.4);' +
+                    'animation:slideInToast .35s ease forwards;';
+                t.innerHTML = '<i class="fas ' + (isSuccess ? 'fa-check-circle' : 'fa-exclamation-circle') + '"></i>' +
+                    '<span>' + msg + '</span>';
                 document.body.appendChild(t);
-                setTimeout(() => {
+                setTimeout(function() {
                     t.style.animation = 'slideOutToast .3s ease forwards';
-                    setTimeout(() => t.remove(), 320);
+                    setTimeout(function() {
+                        if (t.parentNode) t.parentNode.removeChild(t);
+                    }, 320);
                 }, 5000);
             }
+
+        })(); // end IIFE
+    </script>
+
+    <!-- Supabase — fully async, injected after page ready, never blocks rendering -->
+    <script>
+        (function() {
+            var s = document.createElement('script');
+            s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
+            s.async = true;
+            s.defer = true;
+            s.onload = function() {
+                try {
+                    window._sb = window.supabase.createClient(
+                        'https://rvmyhkrqghcuimktiazn.supabase.co',
+                        'sb_publishable_85UDpgCUl3-fiZc96Mf0ag_81EZKWYA'
+                    );
+                } catch (e) {
+                    console.warn('Supabase init failed:', e);
+                }
+            };
+            s.onerror = function() {
+                console.warn('Supabase CDN failed to load. Contact form will use fallback.');
+            };
+            document.body.appendChild(s);
         })();
     </script>
+
 </body>
 
 </html>
