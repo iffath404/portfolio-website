@@ -7,7 +7,7 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
-# Add environment variables for Supabase
+# Global environment variables
 env:
   SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
   SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
@@ -32,30 +32,38 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '20'
       
       - name: Test Supabase Connection
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
         run: |
+          if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_ANON_KEY" ]; then
+            echo "⚠️ Warning: Supabase secrets not configured. Skipping connection test."
+            exit 0
+          fi
+          npm init -y
           npm install @supabase/supabase-js
           node -e "
           const { createClient } = require('@supabase/supabase-js');
           const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
           
-          supabase.from('messages').select('*', { count: 'exact', head: true })
-            .then(({ count, error }) => {
+          async function checkConn() {
+            try {
+              const { count, error } = await supabase.from('messages').select('*', { count: 'exact', head: true });
               if (error) {
                 console.error('❌ Connection failed:', error.message);
                 process.exit(1);
               }
               console.log('✅ Supabase connected! Total messages:', count);
-            })
-            .catch(err => {
+              process.exit(0);
+            } catch (err) {
               console.error('❌ Error:', err.message);
               process.exit(1);
-            });
+            }
+          }
+          checkConn();
           "
   
   # Validate HTML with Supabase integration
@@ -68,8 +76,7 @@ jobs:
       - name: Check for Supabase API keys
         run: |
           if grep -q "SUPABASE_URL" index.html; then
-            echo "⚠️  Warning: Hardcoded Supabase URL detected in HTML"
-            echo "Consider using environment variables"
+            echo "⚠️ Warning: Hardcoded Supabase URL detected in HTML"
           fi
           
           if grep -q "sb_publishable_85UDpgCUl3-fiZc96Mf0ag_81EZKWYA" index.html; then
