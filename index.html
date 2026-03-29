@@ -10,7 +10,7 @@
     <!-- Google Fonts: DM Sans, Bebas Neue, DM Mono -->
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&family=Bebas+Neue&display=swap" rel="stylesheet">
     <style>
-        /* ---------- RESET & ROOT VARIABLES (fully preserved, only fixed syntax errors) ---------- */
+        /* ---------- RESET & ROOT VARIABLES ---------- */
         
          :root {
             --bg: #0f1209;
@@ -1760,7 +1760,9 @@
                     <form id="contactForm">
                         <div class="form-row"><label for="name">Name</label><input type="text" id="name" name="from_name" class="form-field" required></div>
                         <div class="form-row"><label for="email">Email</label><input type="email" id="email" name="from_email" class="form-field" required></div>
-                        <div class="form-row"><label for="message">Message</label><textarea id="message" name="message" class="form-field" required></textarea></div><button type="submit" class="form-submit">Send Message →</button></form>
+                        <div class="form-row"><label for="message">Message</label><textarea id="message" name="message" class="form-field" required></textarea></div>
+                        <button type="submit" class="form-submit">Send Message →</button>
+                    </form>
                 </div>
             </div>
         </div>
@@ -1775,8 +1777,23 @@
         </div>
     </footer>
 
+    <!-- Supabase Script -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <script>
         (function() {
+            // Initialize Supabase
+            const SUPABASE_URL = 'https://rvmyhkrqghcuimktiazn.supabase.co';
+            const SUPABASE_ANON_KEY = 'sb_publishable_85UDpgCUl3-fiZc96Mf0ag_81EZKWYA';
+
+            let supabaseClient = null;
+
+            // Initialize Supabase client
+            if (window.supabase) {
+                supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                window._sb = supabaseClient;
+            }
+
             // loader name animation
             const nameEl = document.getElementById('loaderName');
             if (nameEl) {
@@ -1950,18 +1967,59 @@
             function initContactForm() {
                 const form = document.getElementById('contactForm');
                 if (!form) return;
+
                 form.addEventListener('submit', async(e) => {
                     e.preventDefault();
+
+                    // Get form values
+                    const name = document.getElementById('name').value.trim();
+                    const email = document.getElementById('email').value.trim();
+                    const message = document.getElementById('message').value.trim();
+
+                    // Validate
+                    if (!name || !email || !message) {
+                        showToast('Please fill in all fields', 'error');
+                        return;
+                    }
+
                     const btn = form.querySelector('button[type="submit"]');
                     const orig = btn.innerHTML;
                     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
                     btn.disabled = true;
+
                     try {
-                        await new Promise(resolve => setTimeout(resolve, 600));
-                        showToast("Message sent! I'll get back to you soon.", 'success');
+                        // Make sure Supabase is initialized
+                        let sb = window._sb;
+                        if (!sb) {
+                            // Try to initialize again
+                            if (window.supabase) {
+                                sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                                window._sb = sb;
+                            } else {
+                                throw new Error('Supabase not loaded');
+                            }
+                        }
+
+                        // Insert into messages table
+                        const {
+                            data,
+                            error
+                        } = await sb
+                            .from('messages')
+                            .insert([{
+                                name: name,
+                                email: email,
+                                message: message
+                            }]);
+
+                        if (error) throw error;
+
+                        showToast("✓ Message sent successfully! I'll get back to you soon.", 'success');
                         form.reset();
+
                     } catch (err) {
-                        showToast('Failed to send. Please email me directly.', 'error');
+                        console.error('Supabase error:', err);
+                        showToast('❌ Failed to send. Please email me directly at ummaraiffath@gmail.com', 'error');
                     } finally {
                         btn.innerHTML = orig;
                         btn.disabled = false;
